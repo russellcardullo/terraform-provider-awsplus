@@ -33,6 +33,7 @@ func Provider() terraform.ResourceProvider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"awsplus_kinesis_stream": resourceKinesisStream(),
+			"awsplus_sqs_queue":      resourceSQSQueue(),
 		},
 
 		ConfigureFunc: providerConfigure,

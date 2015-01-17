@@ -32,7 +32,7 @@ func resourceKinesisStream() *schema.Resource {
 }
 
 func resourceKinesisStreamCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*kinesis.Kinesis)
+	client := meta.(*AWSClient).kinesisconn
 
 	streamName := d.Get("name").(string)
 	shardCount := d.Get("shard_count").(int)
@@ -49,7 +49,7 @@ func resourceKinesisStreamCreate(d *schema.ResourceData, meta interface{}) error
 }
 
 func resourceKinesisStreamRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*kinesis.Kinesis)
+	client := meta.(*AWSClient).kinesisconn
 
 	description, err := client.DescribeStream(d.Get("name").(string))
 	if err != nil {
@@ -68,7 +68,7 @@ func resourceKinesisStreamRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceKinesisStreamDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*kinesis.Kinesis)
+	client := meta.(*AWSClient).kinesisconn
 
 	log.Printf("[INFO] Deleting Stream: %v", d.Id())
 

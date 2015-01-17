@@ -9,6 +9,7 @@ import (
 
 	"github.com/crowdmob/goamz/aws"
 	"github.com/crowdmob/goamz/kinesis"
+	"github.com/crowdmob/goamz/sqs"
 )
 
 type Config struct {
@@ -17,9 +18,15 @@ type Config struct {
 	Region    string
 }
 
+type AWSClient struct {
+	kinesisconn *kinesis.Kinesis
+	sqsconn     *sqs.SQS
+}
+
 // Client() returns a new client for accessing kinesis.
 
-func (c *Config) Client() (*kinesis.Kinesis, error) {
+func (c *Config) Client() (interface{}, error) {
+	var client AWSClient
 
 	auth, err := c.AWSAuth()
 	if err != nil {
@@ -31,16 +38,17 @@ func (c *Config) Client() (*kinesis.Kinesis, error) {
 		return nil, err
 	}
 
-	client := kinesis.New(auth, region)
+	client.kinesisconn = kinesis.New(auth, region)
+	client.sqsconn = sqs.New(auth, region)
 
 	log.Println("[INFO] Kinesis Client configured")
 
-	return client, nil
+	return &client, nil
 }
 
 func (c *Config) AWSAuth() (aws.Auth, error) {
 	exptdate := time.Now().Add(time.Hour)
-	auth, err := aws.GetAuth(c.AccessKey, c.SecretKey, "token", exptdate)
+	auth, err := aws.GetAuth(c.AccessKey, c.SecretKey, "", exptdate)
 	if err == nil {
 		c.AccessKey = auth.AccessKey
 		c.SecretKey = auth.SecretKey
